@@ -2,6 +2,7 @@ package com.example.demo.controller.impl;
 
 import com.example.demo.controller.CryptoController;
 import com.example.demo.exceptions.CryptoCodeNotSupportedException;
+import com.example.demo.exceptions.CryptoDataNotFoundException;
 import com.example.demo.services.impl.CryptoServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class CryptoControllerImpl implements CryptoController {
     public ResponseEntity<Object> getCryptoStatsForCode(String cryptoCode) {
         try {
             return ResponseEntity.ok().body(cryptoService.getCryptoStatsForCode(cryptoCode));
-        } catch (CryptoCodeNotSupportedException e) {
+        } catch (CryptoCodeNotSupportedException | CryptoDataNotFoundException  e) {
            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

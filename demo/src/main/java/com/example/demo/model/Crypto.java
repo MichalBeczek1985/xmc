@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @ToString
 public class Crypto {
     @CsvBindByName(column = "timestamp")
-    private String timestamp;
+    private long timestamp;
     @CsvBindByName(column = "symbol")
     private String code;
     @CsvBindByName(column = "price")

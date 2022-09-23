@@ -6,5 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataProvider {
-    Map<String, List<TimePrice>> getData();
+    List<String> getAvailableCodes();
+    Map<String, List<TimePrice>> getDataForCode(String code);
+    Map<String, List<TimePrice>> getAllData();
 }

@@ -27,22 +27,55 @@ public class DataProviderImpl implements DataProvider {
     private final ResourcePatternResolver patternResolver;
 
     @Override
-    public Map<String, List<TimePrice>> getData() {
+    public List<String> getAvailableCodes() {
+        try {
+            Resource[] resources = getResources(SOURCE_PATH);
+            return Arrays.stream(resources).map(resource ->
+                            Objects.requireNonNull(resource.getFilename()).substring(0, resource.getFilename().indexOf(CODE_SEPARATOR)))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Map<String, List<TimePrice>> getDataForCode(String code) {
         Map<String, List<TimePrice>> dataMap = new HashMap<>();
         try {
-                Resource[] resources = getResources(SOURCE_PATH);
-                for (Resource r : resources) {
-                    List<Crypto> csvDate = readLinesFromCsvFile(r);
-                    if(!csvDate.isEmpty()) {
-                        List<TimePrice> collect = csvDate.stream().map(cryptoTimePriceFunction()).sorted(Comparator.comparing(TimePrice::getDateTime)).collect(Collectors.toList());
-                        dataMap.put(csvDate.get(0).getCode(), collect);
-                    }
+            Resource[] resources = getResources(String.format(SINGLE_FILE_SOURCE_PATH,code));
+            if(resources.length>0) {
+                Resource r = resources[0];
+                List<Crypto> csvDate = readLinesFromCsvFile(r);
+                if (!csvDate.isEmpty()) {
+                    List<TimePrice> collect = csvDate.stream().map(cryptoTimePriceFunction()).sorted(Comparator.comparing(TimePrice::getDateTime)).collect(Collectors.toList());
+                    dataMap.put(csvDate.get(0).getCode(), collect);
                 }
-                } catch (IOException e) {
-                e.printStackTrace();
             }
-            return dataMap;
+
+            } catch (IOException e) {
+            e.printStackTrace();
         }
+        return dataMap;
+    }
+
+    @Override
+    public Map<String, List<TimePrice>> getAllData() {
+        Map<String, List<TimePrice>> dataMap = new HashMap<>();
+        try {
+            Resource[] resources = getResources(SOURCE_PATH);
+            for (Resource r : resources) {
+                List<Crypto> csvDate = readLinesFromCsvFile(r);
+                if (!csvDate.isEmpty()) {
+                    List<TimePrice> collect = csvDate.stream().map(cryptoTimePriceFunction()).sorted(Comparator.comparing(TimePrice::getDateTime)).collect(Collectors.toList());
+                    dataMap.put(csvDate.get(0).getCode(), collect);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return dataMap;
+    }
 
     private Resource[] getResources(String sourcePath) throws IOException {
         return patternResolver.getResources(sourcePath);
@@ -54,13 +87,14 @@ public class DataProviderImpl implements DataProvider {
                 .build()
                 .parse();
     }
+
     private Function<Crypto, TimePrice> cryptoTimePriceFunction() {
         return crypto -> new TimePrice(
                 convert(crypto.getTimestamp()), crypto.getPrice());
     }
 
-    private LocalDateTime convert(String s) {
-        return Instant.ofEpochMilli(Long.parseLong(s))
+    private LocalDateTime convert(long timestamp) {
+        return Instant.ofEpochMilli(timestamp)
                 .atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 

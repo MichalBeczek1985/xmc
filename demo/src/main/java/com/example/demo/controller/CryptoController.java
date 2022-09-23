@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,8 @@ public interface CryptoController {
     @GetMapping("/normalized/{date}")
     @ApiOperation(value="Returns  n a descending sorted list of all the cryptos,\n" +
             "comparing the normalized range for the given date")
-    ResponseEntity<Object> getCryptoNormalizedForDate(@RequestParam String date);
+    ResponseEntity<Object> getCryptoNormalizedForDate(@ApiParam(name="date",example = "2022-02-02")
+                                                      @RequestParam String date);
 
     @GetMapping("/stats")
     @ApiOperation(value="Returns  oldest/newest/min/max for each crypto ")

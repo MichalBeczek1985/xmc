@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.exceptions.CryptoCodeNotSupportedException;
+import com.example.demo.exceptions.CryptoDataNotFoundException;
 import com.example.demo.model.CryptoDtoNormalized;
 import com.example.demo.model.CryptoDtoStats;
 import com.example.demo.model.TimePrice;
@@ -12,7 +13,7 @@ public interface CryptoService {
     List<String> getCryptoCodes();
     Map<String, List<TimePrice>> getAllPrices();
     List<CryptoDtoStats> getCryptoStats();
-    CryptoDtoStats getCryptoStatsForCode(String code) throws CryptoCodeNotSupportedException;
+    CryptoDtoStats getCryptoStatsForCode(String code) throws CryptoCodeNotSupportedException, CryptoDataNotFoundException;
     List<CryptoDtoNormalized> getCryptoNormalized();
     List<CryptoDtoNormalized> getCryptoNormalizedForDate(String date);
 }
